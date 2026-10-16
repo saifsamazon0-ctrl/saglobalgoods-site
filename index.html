@@ -370,7 +370,7 @@ footer .reg { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing:
 
           <div class="field">
             <span class="eyebrow">Direct trade line</span>
-            <div class="value" id="phone-text">+44 7586730774</div>
+            <div class="value" id="phone-text">+447586730774</div>
             <div class="actions">
               <button class="btn btn-fill btn-sm" id="copy-phone" type="button">Copy number</button>
               <a class="btn btn-line btn-sm" href="tel:+447586730774">Call</a>
@@ -391,7 +391,7 @@ footer .reg { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing:
 <footer>
   <div class="wrap">
     <p>&copy; 2026 SA Global Goods Ltd. All rights reserved.</p>
-    <p class="reg">Registered in England and Wales &middot; Company No. 17463982</p>
+    <p class="reg">Registered in England and Wales &middot; Company No. 17463982<br>Registered office: 55 Dearnalay Way, Oldham, OL9 7BF</p>
   </div>
 </footer>
 
@@ -412,10 +412,24 @@ footer .reg { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing:
     function fail() { selectText(); note.textContent = 'Selected. Press Ctrl+C (or Cmd+C) to copy.'; }
     btn.addEventListener('click', function () {
       var t = src.textContent.trim();
-      try {
-        navigator.clipboard.writeText(t).then(ok, fail);
-      } catch (e) {
-        fail();
+      function legacy() {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = t;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, t.length);
+          var done = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (done) { ok(); } else { fail(); }
+        } catch (e) { fail(); }
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(t).then(ok, legacy);
+      } else {
+        legacy();
       }
     });
   }
